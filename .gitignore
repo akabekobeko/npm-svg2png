@@ -102,3 +102,12 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Project
+dist/
+.*
+package-lock.json
+!.gitignore
+!.prettierrc
+!.prettierignore
+!.travis.yml
