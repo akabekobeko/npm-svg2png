@@ -1,3 +1,7 @@
+import fs from 'fs'
+import { convert } from './convert'
+import { fetchRenderer } from './fetch-renderer'
+
 /** Options of svg2png. */
 export type SVG2PNGOptions = {
   /** Path of the input SVG file. */
@@ -12,10 +16,10 @@ export type SVG2PNGOptions = {
    * If use Chromium installed, specify the path of the executable file.
    * If this is specified, `fetcher` will be ignored.
    */
-  executablePath: string
+  executablePath?: string
 
   /** Information for downloading and using Chromium. */
-  fetcher: {
+  fetcher?: {
     /**
      * Revision of the download Chromium.
      * @see http://omahaproxy.appspot.com/
@@ -29,4 +33,36 @@ export type SVG2PNGOptions = {
   }
 }
 
-export const svg2png = (options: SVG2PNGOptions) => {}
+/**
+ * Gets the Chromium path for rendering SVG.
+ * @param options Options.
+ * @returns Path of Chromium.
+ * @throws `fetcher` is not specified even though `executablePath` is omitted.
+ */
+const getExecutablePath = async (options: SVG2PNGOptions) => {
+  if (options.executablePath && fs.existsSync(options.executablePath)) {
+    return options.executablePath
+  }
+
+  if (!options.fetcher) {
+    throw new Error(
+      '`fetcher` is not specified even though `executablePath` is omitted. Be sure to specify either.'
+    )
+  }
+
+  return fetchRenderer(options.fetcher.revision, options.fetcher.path)
+}
+
+/**
+ * Create the PNG file from the SVG file.
+ * @param options Options.
+ */
+export const svg2png = async (options: SVG2PNGOptions) => {
+  return convert({
+    input: options.input,
+    output: options.output,
+    width: options.width,
+    height: options.height,
+    executablePath: await getExecutablePath(options)
+  })
+}
