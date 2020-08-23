@@ -8,8 +8,6 @@ export type SVG2PNGOptions = {
   width: number
   /** Height (px) of the output PNG file. */
   height: number
-  /** Display the process reports, default is disable. */
-  report: boolean
   /**
    * If use Chromium installed, specify the path of the executable file.
    * If this is specified, `fetcher` will be ignored.
@@ -30,3 +28,5 @@ export type SVG2PNGOptions = {
     path: string
   }
 }
+
+export const svg2png = (options: SVG2PNGOptions) => {}
