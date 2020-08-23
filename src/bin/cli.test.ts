@@ -27,18 +27,6 @@ describe('cli', () => {
       assert.strictEqual(options.output, 'sample.png')
     })
 
-    it('-r', () => {
-      const argv = ['', '', '-r']
-      const options = parseArgv(argv)
-      assert.strictEqual(options.report, true)
-    })
-
-    it('--report', () => {
-      const argv = ['', '', '--report']
-      const options = parseArgv(argv)
-      assert.strictEqual(options.report, true)
-    })
-
     it('--width', () => {
       const argv = ['', '', '--width', '256']
       const options = parseArgv(argv)
@@ -82,7 +70,6 @@ describe('cli', () => {
       const options = parseArgv(argv)
       assert.strictEqual(options.input, '')
       assert.strictEqual(options.output, '')
-      assert.strictEqual(options.report, false)
       assert.strictEqual(options.width, 0)
       assert.strictEqual(options.height, 0)
       assert.strictEqual(options.executablePath, '')

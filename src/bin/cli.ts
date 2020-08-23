@@ -16,11 +16,6 @@ export const parseArgv = (argv: string[]): SVG2PNGOptions => {
     .option('-i, --input <String>', 'Path of the input SVG file.', '')
     .option('-o, --output <String>', 'Path of the output PNG file.', '')
     .option(
-      '-r, --report',
-      'Display the process reports, default is disable.',
-      false
-    )
-    .option(
       '--width <Number>',
       'Width (px) of the output PNG file.',
       parseInt,
@@ -52,9 +47,9 @@ export const parseArgv = (argv: string[]): SVG2PNGOptions => {
   program.on('--help', () => {
     console.log(`
 Examples:
-  $ icon-gen -i sample.svg -o sample.png -r --width 256 --height 256 --executable-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-  $ icon-gen -i sample.svg -o sample.png -r --width 256 --height 256 --executable-path "C:\Program Files (x86)\Google\Chrome\Application\Chrome.exe"
-  $ icon-gen -i sample.svg -o sample.png -r --width 256 --height 256 --fetcher-revision 768962 --fetcher-path ./chrome
+  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --executable-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --executable-path "C:\Program Files (x86)\Google\Chrome\Application\Chrome.exe"
+  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --fetcher-revision 768962 --fetcher-path ./chrome
 
 See also:
   https://github.com/akabekobeko/npm-svg2png`)
@@ -77,7 +72,6 @@ See also:
     output: opts.output,
     width: opts.width,
     height: opts.height,
-    report: opts.report,
     executablePath: opts.executablePath,
     fetcher: {
       revision: opts.fetcherRevision,
