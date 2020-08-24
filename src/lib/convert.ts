@@ -77,12 +77,9 @@ export const convert = async (options: ConvertOptions): Promise<void> => {
     )
 
     await page.screenshot({ path: options.output })
-
-    await page.close()
-    await browser.close()
   } catch (error) {
-    await page.close()
-    await browser.close()
     throw error
+  } finally {
+    await browser.close()
   }
 }
