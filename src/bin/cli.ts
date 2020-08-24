@@ -1,5 +1,5 @@
 import commander from 'commander'
-import { SVG2PNGOptions } from '../lib/index'
+import { svg2png, SVG2PNGOptions } from '../lib/index'
 
 /**
  * Parse the arguments of command line interface.
@@ -9,9 +9,9 @@ import { SVG2PNGOptions } from '../lib/index'
 export const parseArgv = (argv: string[]): SVG2PNGOptions => {
   const program = new commander.Command()
   program
-    .usage('icon-gen [options]')
+    .usage('svg2png [options]')
     .description(
-      'Generate an icon from the SVG or PNG file.\nIf "--ico", "--icns", "--favicon" is not specified, everything is output in the standard setting.'
+      'Create PNG file from SVG file with puppeteer-core. Use the specified revision or installed Chromium for PNG file creation.'
     )
     .option('-i, --input <String>', 'Path of the input SVG file.', '')
     .option('-o, --output <String>', 'Path of the output PNG file.', '')
@@ -19,13 +19,13 @@ export const parseArgv = (argv: string[]): SVG2PNGOptions => {
       '--width <Number>',
       'Width (px) of the output PNG file.',
       parseInt,
-      0
+      256
     )
     .option(
       '--height <Number>',
       'Height (px) of the output PNG file.',
       parseInt,
-      0
+      256
     )
     .option(
       '--executable-path <String>',
@@ -47,9 +47,9 @@ export const parseArgv = (argv: string[]): SVG2PNGOptions => {
   program.on('--help', () => {
     console.log(`
 Examples:
-  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --executable-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --executable-path "C:\Program Files (x86)\Google\Chrome\Application\Chrome.exe"
-  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --fetcher-revision 768962 --fetcher-path ./chrome
+  $ svg2png -i sample.svg -o sample.png --width 256 --height 256 --executable-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  $ svg2png -i sample.svg -o sample.png --width 256 --height 256 --executable-path "C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe"
+  $ svg2png -i sample.svg -o sample.png --width 256 --height 256 --fetcher-revision 768962 --fetcher-path ./renderer
 
 See also:
   https://github.com/akabekobeko/npm-svg2png`)
@@ -78,4 +78,13 @@ See also:
       path: opts.fetcherPath
     }
   }
+}
+
+/**
+ * Run the tool based on command line arguments.
+ * @param argv Arguments of command line interface.
+ * @returns Path of generated files.
+ */
+export const exec = (argv: string[]) => {
+  return svg2png(parseArgv(argv))
 }
