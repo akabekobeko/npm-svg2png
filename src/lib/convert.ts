@@ -1,6 +1,8 @@
 import fs from 'fs'
 import util from 'util'
-import puppeteer from 'puppeteer-core'
+import upath from 'upath'
+import puppeteer, { Page } from 'puppeteer-core'
+import { Size } from './index'
 
 const readFileAsync = util.promisify(fs.readFile)
 
@@ -10,10 +12,8 @@ export type ConvertOptions = {
   input: string
   /** Path of the output PNG file. */
   output: string
-  /** Width (px) of the output PNG file. */
-  width: number
-  /** Height (px) of the output PNG file. */
-  height: number
+  /** Sizes of the output PNG files. */
+  sizes: Size[]
   /**
    * If use Chromium installed, specify the path of the executable file.
    * If this is specified, `fetcher` will be ignored.
@@ -32,51 +32,96 @@ const createHTML = async (filePath: string): Promise<string> => {
 }
 
 /**
- * Convert the SVG to PNG.
- * @param options Options.
+ * Create the PNG file with the specified size.
+ * @param page Page instance with SVG loaded.
+ * @param size Size of the PNG image (px).
+ * @param filePath Path of the output PNG file.
  */
-export const convert = async (options: ConvertOptions): Promise<void> => {
-  const browser = await puppeteer.launch({
-    executablePath: options.executablePath,
-    defaultViewport: {
-      width: options.width,
-      height: options.height
+const createPNG = async (page: Page, size: Size, filePath: string) => {
+  await page.setViewport({ width: size.width, height: size.height })
+
+  // Explicitly fix the size of SVG tags.
+  // see: https://github.com/neocotic/convert-svg/blob/master/packages/convert-svg-core/src/Converter.js
+  await page.evaluate(
+    ({ width, height }) => {
+      const elm = document.querySelector('svg')
+      if (!elm) {
+        return
+      }
+
+      if (typeof width === 'number') {
+        elm.setAttribute('width', `${width}px`)
+      } else {
+        elm.removeAttribute('width')
+      }
+
+      if (typeof height === 'number') {
+        elm.setAttribute('height', `${height}px`)
+      } else {
+        elm.removeAttribute('height')
+      }
+    },
+    {
+      width: size.width,
+      height: size.height
     }
+  )
+
+  await page.screenshot({ path: filePath })
+}
+
+/**
+ *
+ * @param dir Path of the parent directory.
+ * @param name Name of the PNG file.
+ * @param ext File extention of the PNG file (User specified).
+ * @param size Size of the PNG image.
+ */
+const createFilePath = (
+  dir: string,
+  name: string,
+  ext: string,
+  size: Size
+): string => {
+  const fileName =
+    size.width === size.height
+      ? `${name}-${size.width}${ext}`
+      : `${name}-${size.width}x${size.height}${ext}`
+
+  return upath.join(dir, fileName)
+}
+
+/**
+ * Convert the SVG to the PNG.
+ * @param options Options.
+ * @returns Path collection of the output PNG files.
+ */
+export const convert = async (options: ConvertOptions): Promise<string[]> => {
+  const browser = await puppeteer.launch({
+    executablePath: options.executablePath
   })
 
   const page = await browser.newPage()
+  const results: string[] = []
 
   try {
     await page.setContent(await createHTML(options.input))
+    if (options.sizes.length === 1) {
+      await createPNG(page, options.sizes[0], options.output)
+      results.push(options.output)
+    } else {
+      const dir = upath.dirname(options.output)
+      const ext = upath.extname(options.output)
+      const name = upath.basename(options.output, ext)
 
-    // Explicitly fix the size of SVG tags.
-    // see: https://github.com/neocotic/convert-svg/blob/master/packages/convert-svg-core/src/Converter.js
-    await page.evaluate(
-      ({ width, height }) => {
-        const elm = document.querySelector('svg')
-        if (!elm) {
-          return
-        }
-
-        if (typeof width === 'number') {
-          elm.setAttribute('width', `${width}px`)
-        } else {
-          elm.removeAttribute('width')
-        }
-
-        if (typeof height === 'number') {
-          elm.setAttribute('height', `${height}px`)
-        } else {
-          elm.removeAttribute('height')
-        }
-      },
-      {
-        width: options.width,
-        height: options.height
+      for (const size of options.sizes) {
+        const filePath = createFilePath(dir, name, ext, size)
+        await createPNG(page, size, filePath)
+        results.push(filePath)
       }
-    )
+    }
 
-    await page.screenshot({ path: options.output })
+    return results
   } catch (error) {
     throw error
   } finally {
