@@ -1,0 +1,20 @@
+{
+  "name": "examples-svg2png",
+  "description": "Examples for @akabeko/svg2png.",
+  "private": true,
+  "version": "1.0.0",
+  "author": "akabeko (http://akabeko.me/)",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "js": "node index.js",
+    "ts": "ts-node index.ts",
+    "cli:single": "svg2png -i sample.svg -o sample.png --sizes [256] --fetcher-revision 782078 --fetcher-path ./renderer",
+    "cli:multiple": "svg2png -i sample.svg -o sample.png --sizes [256,[128,256]] --fetcher-revision 782078 --fetcher-path ./renderer"
+  },
+  "dependencies": {
+    "@akabeko/svg2png": "1.0.0",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
+  }
+}

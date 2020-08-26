@@ -1,5 +1,49 @@
 import commander from 'commander'
-import { SVG2PNGOptions } from '../lib/index'
+import { svg2png, SVG2PNGOptions } from '../lib/index'
+import { Size } from '../lib/convert'
+
+/**
+ * Parses the value of the array specified in `sizes` into `Size`.
+ * @param value Value of `sizes`.
+ * @returns `Size` on success. Otherwise `undefined`.
+ */
+const parseSizeValue = (value: any): Size | undefined => {
+  if (typeof value === 'number') {
+    return { width: value, height: value }
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 1) {
+      const width = parseInt(value[0])
+      return { width, height: width }
+    }
+
+    if (1 < value.length) {
+      return { width: parseInt(value[0]), height: parseInt(value[1]) }
+    }
+  }
+}
+
+/**
+ * Parse `sizes` to create `Size[]`.
+ * @param arg The argument specified with the `sizes` in CLI option.
+ */
+const parseSizes = (arg: string): Size[] => {
+  const obj = JSON.parse(arg)
+  if (!Array.isArray(obj)) {
+    return []
+  }
+
+  const sizes: Size[] = []
+  for (const value of obj) {
+    const size = parseSizeValue(value)
+    if (size) {
+      sizes.push(size)
+    }
+  }
+
+  return sizes
+}
 
 /**
  * Parse the arguments of command line interface.
@@ -9,23 +53,16 @@ import { SVG2PNGOptions } from '../lib/index'
 export const parseArgv = (argv: string[]): SVG2PNGOptions => {
   const program = new commander.Command()
   program
-    .usage('icon-gen [options]')
+    .usage('svg2png [options]')
     .description(
-      'Generate an icon from the SVG or PNG file.\nIf "--ico", "--icns", "--favicon" is not specified, everything is output in the standard setting.'
+      'Create PNG file from SVG file with puppeteer-core. Use the specified revision or installed Chromium for PNG file creation.'
     )
     .option('-i, --input <String>', 'Path of the input SVG file.', '')
     .option('-o, --output <String>', 'Path of the output PNG file.', '')
     .option(
-      '--width <Number>',
-      'Width (px) of the output PNG file.',
-      parseInt,
-      0
-    )
-    .option(
-      '--height <Number>',
-      'Height (px) of the output PNG file.',
-      parseInt,
-      0
+      '--sizes <Size[]>',
+      'Sizes array of the output PNG file. Specify one element for the array if it is a square, and specify [width,height] for a rectangle. e.g. [256,[256,128],...]',
+      parseSizes
     )
     .option(
       '--executable-path <String>',
@@ -47,9 +84,9 @@ export const parseArgv = (argv: string[]): SVG2PNGOptions => {
   program.on('--help', () => {
     console.log(`
 Examples:
-  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --executable-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --executable-path "C:\Program Files (x86)\Google\Chrome\Application\Chrome.exe"
-  $ icon-gen -i sample.svg -o sample.png --width 256 --height 256 --fetcher-revision 768962 --fetcher-path ./chrome
+  $ svg2png -i sample.svg -o sample.png --sizes [256] --executable-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  $ svg2png -i sample.svg -o sample.png --sizes [[24,32],256] --executable-path "C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe"
+  $ svg2png -i sample.svg -o sample.png --sizes [256] --fetcher-revision 782078 --fetcher-path ./renderer
 
 See also:
   https://github.com/akabekobeko/npm-svg2png`)
@@ -70,12 +107,20 @@ See also:
   return {
     input: opts.input,
     output: opts.output,
-    width: opts.width,
-    height: opts.height,
+    sizes: opts.sizes || [],
     executablePath: opts.executablePath,
     fetcher: {
       revision: opts.fetcherRevision,
       path: opts.fetcherPath
     }
   }
+}
+
+/**
+ * Run the tool based on command line arguments.
+ * @param argv Arguments of command line interface.
+ * @returns Path of generated files.
+ */
+export const exec = (argv: string[]) => {
+  return svg2png(parseArgv(argv))
 }

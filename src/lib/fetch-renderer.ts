@@ -1,5 +1,6 @@
 import fs from 'fs'
 import util from 'util'
+import upath from 'upath'
 import puppeteer from 'puppeteer-core'
 
 const statAsync = util.promisify(fs.stat)
@@ -32,7 +33,9 @@ export const fetchRenderer = async (
   revision: string,
   path: string
 ): Promise<string> => {
-  const downloadPath = isValidDownloadPath(path) ? path : undefined
+  const downloadPath = isValidDownloadPath(path)
+    ? upath.resolve(path) // Target directory is expected to be absolute
+    : undefined
   const fetcher = puppeteer.createBrowserFetcher({ path: downloadPath })
   if (!fetcher.canDownload(revision)) {
     throw new Error('The specified `revision` cannot be download.')

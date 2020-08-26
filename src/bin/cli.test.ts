@@ -1,5 +1,6 @@
 import assert from 'assert'
 import { parseArgv } from './cli'
+import { Size } from '../lib/convert'
 
 describe('cli', () => {
   describe('parseArgv', () => {
@@ -27,16 +28,30 @@ describe('cli', () => {
       assert.strictEqual(options.output, 'sample.png')
     })
 
-    it('--width', () => {
-      const argv = ['', '', '--width', '256']
-      const options = parseArgv(argv)
-      assert.strictEqual(options.width, 256)
-    })
+    describe('--sizes', () => {
+      it('Square', () => {
+        const argv = ['', '', '--sizes', '[256]']
+        const options = parseArgv(argv)
+        const expected: Size[] = [{ width: 256, height: 256 }]
+        assert.deepStrictEqual(options.sizes, expected)
+      })
 
-    it('--height', () => {
-      const argv = ['', '', '--height', '256']
-      const options = parseArgv(argv)
-      assert.strictEqual(options.height, 256)
+      it('Rectangle', () => {
+        const argv = ['', '', '--sizes', '[[128,256]]']
+        const options = parseArgv(argv)
+        const expected: Size[] = [{ width: 128, height: 256 }]
+        assert.deepStrictEqual(options.sizes, expected)
+      })
+
+      it('Multiple (Square, Rectangle)', () => {
+        const argv = ['', '', '--sizes', '[256, [128,256]]']
+        const options = parseArgv(argv)
+        const expected: Size[] = [
+          { width: 256, height: 256 },
+          { width: 128, height: 256 }
+        ]
+        assert.deepStrictEqual(options.sizes, expected)
+      })
     })
 
     it('--executable-path', () => {
@@ -56,13 +71,13 @@ describe('cli', () => {
     it('--fetcher-revision', () => {
       const argv = ['', '', '--fetcher-revision', '768962']
       const options = parseArgv(argv)
-      assert.strictEqual(options.fetcher.revision, '768962')
+      assert.strictEqual(options.fetcher!.revision, '768962')
     })
 
     it('--fetcher-path', () => {
-      const argv = ['', '', '--fetcher-path', './chrome']
+      const argv = ['', '', '--fetcher-path', './renderer']
       const options = parseArgv(argv)
-      assert.strictEqual(options.fetcher.path, './chrome')
+      assert.strictEqual(options.fetcher!.path, './renderer')
     })
 
     it('defaults', () => {
@@ -70,11 +85,10 @@ describe('cli', () => {
       const options = parseArgv(argv)
       assert.strictEqual(options.input, '')
       assert.strictEqual(options.output, '')
-      assert.strictEqual(options.width, 0)
-      assert.strictEqual(options.height, 0)
+      assert.deepStrictEqual(options.sizes, [])
       assert.strictEqual(options.executablePath, '')
-      assert.strictEqual(options.fetcher.revision, '')
-      assert.strictEqual(options.fetcher.path, '')
+      assert.strictEqual(options.fetcher!.revision, '')
+      assert.strictEqual(options.fetcher!.path, '')
     })
   })
 })

@@ -1,5 +1,6 @@
 import fs from 'fs'
-import { convert } from './convert'
+import upath from 'upath'
+import { convert, Size } from './convert'
 import { fetchRenderer } from './fetch-renderer'
 
 /** Options of svg2png. */
@@ -8,10 +9,8 @@ export type SVG2PNGOptions = {
   input: string
   /** Path of the output PNG file. */
   output: string
-  /** Width (px) of the output PNG file. */
-  width: number
-  /** Height (px) of the output PNG file. */
-  height: number
+  /** Sizes of the output PNG files. */
+  sizes: Size[]
   /**
    * If use Chromium installed, specify the path of the executable file.
    * If this is specified, `fetcher` will be ignored.
@@ -54,15 +53,44 @@ const getExecutablePath = async (options: SVG2PNGOptions) => {
 }
 
 /**
+ * Check options.
+ * Correct the exception if the required value is invalid, and fix it if it can.
+ * @param options Options.
+ * @returns Checked options.
+ */
+export const checkOptions = (options: SVG2PNGOptions): SVG2PNGOptions => {
+  const opts = Object.assign({}, options)
+
+  if (!fs.existsSync(opts.input)) {
+    throw new Error('The file specified in `input` does not exist.')
+  }
+
+  {
+    const dir = upath.dirname(opts.output)
+    if (!fs.existsSync(dir)) {
+      const pngDir = upath.dirname(opts.input)
+      opts.output = upath.join(pngDir, upath.basename(opts.output))
+    }
+  }
+
+  if (opts.sizes.length === 0) {
+    throw new Error('No `sizes` is specified.')
+  }
+
+  return opts
+}
+
+/**
  * Create the PNG file from the SVG file.
  * @param options Options.
+ * @returns Path collection of the output PNG files.
  */
-export const svg2png = async (options: SVG2PNGOptions) => {
+export const svg2png = async (options: SVG2PNGOptions): Promise<string[]> => {
+  const opts = checkOptions(options)
   return convert({
-    input: options.input,
-    output: options.output,
-    width: options.width,
-    height: options.height,
-    executablePath: await getExecutablePath(options)
+    input: opts.input,
+    output: opts.output,
+    sizes: opts.sizes,
+    executablePath: await getExecutablePath(opts)
   })
 }
