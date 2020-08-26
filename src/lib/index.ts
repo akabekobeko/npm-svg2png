@@ -1,15 +1,7 @@
 import fs from 'fs'
 import upath from 'upath'
-import { convert } from './convert'
+import { convert, Size } from './convert'
 import { fetchRenderer } from './fetch-renderer'
-
-/** Size of PNG file. */
-export type Size = {
-  /** Width (px). */
-  width: number
-  /** Height (px). */
-  height: number
-}
 
 /** Options of svg2png. */
 export type SVG2PNGOptions = {

@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { parseArgv } from './cli'
-import { Size } from '../lib/index'
+import { Size } from '../lib/convert'
 
 describe('cli', () => {
   describe('parseArgv', () => {

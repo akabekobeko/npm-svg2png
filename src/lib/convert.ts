@@ -2,9 +2,16 @@ import fs from 'fs'
 import util from 'util'
 import upath from 'upath'
 import puppeteer, { Page } from 'puppeteer-core'
-import { Size } from './index'
 
 const readFileAsync = util.promisify(fs.readFile)
+
+/** Size of PNG file. */
+export type Size = {
+  /** Width (px). */
+  width: number
+  /** Height (px). */
+  height: number
+}
 
 /** Options of SVG converter. */
 export type ConvertOptions = {
@@ -67,7 +74,7 @@ const createPNG = async (page: Page, size: Size, filePath: string) => {
     }
   )
 
-  await page.screenshot({ path: filePath })
+  await page.screenshot({ path: filePath, omitBackground: true })
 }
 
 /**

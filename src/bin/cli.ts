@@ -1,5 +1,6 @@
 import commander from 'commander'
-import { svg2png, SVG2PNGOptions, Size } from '../lib/index'
+import { svg2png, SVG2PNGOptions } from '../lib/index'
+import { Size } from '../lib/convert'
 
 /**
  * Parses the value of the array specified in `sizes` into `Size`.
