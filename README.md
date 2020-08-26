@@ -1,6 +1,6 @@
 # svg2png
 
-[![npm version](https://badge.fury.io/js/.svg)](https://badge.fury.io/js/@akabeko/svg2png)
+[![npm version](https://badge.fury.io/js/%40akabeko%2Fsvg2png.svg)](https://badge.fury.io/js/%40akabeko%2Fsvg2png)
 [![Build Status](https://travis-ci.org/akabekobeko/npm-svg2png.svg?branch=master)](https://travis-ci.org/akabekobeko/npm-svg2png)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/akabekobeko/npm-svg2png/blob/master/LICENSE)
 
