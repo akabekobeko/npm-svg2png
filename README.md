@@ -35,6 +35,8 @@ If there is a single `sizes` element, it will be output with the file name speci
 
 When multiple sizes are specified, the size is specified in prefix like `sample-256.png`. If there are multiple sizes and the width and heigth are different, it becomes like `sample-24x32.png`.
 
+Elements of `sizes` with `width` or `height` less than or equal to `0` are ignored. Also, if elements with the same `width`/`height` are duplicated (e.g. `[[24, 24], [24, 24]]` to `[[24, 24]]`), only one of them will be processed.
+
 ```js
 import { svg2png } from '@akabeko/svg2png'
 
