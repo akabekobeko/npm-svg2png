@@ -53,6 +53,29 @@ const getExecutablePath = async (options: SVG2PNGOptions) => {
 }
 
 /**
+ * Optimize the size specification.
+ * @param sizes Sizes.
+ * @returns Optimized sizes.
+ * @throws No `sizes` is specified.
+ */
+const optimizeSizes = (sizes: Size[]) => {
+  const results = sizes
+    .filter((value) => 0 < value.width && 0 < value.height)
+    .filter(
+      (value, index, self) =>
+        self.findIndex(
+          (v: Size) => v.width === value.width && v.height === value.height
+        ) === index
+    )
+
+  if (results.length === 0) {
+    throw new Error('There is no valid `sizes` specification.')
+  }
+
+  return results
+}
+
+/**
  * Check options.
  * Correct the exception if the required value is invalid, and fix it if it can.
  * @param options Options.
@@ -73,9 +96,7 @@ export const checkOptions = (options: SVG2PNGOptions): SVG2PNGOptions => {
     }
   }
 
-  if (opts.sizes.length === 0) {
-    throw new Error('No `sizes` is specified.')
-  }
+  opts.sizes = optimizeSizes(opts.sizes)
 
   return opts
 }
