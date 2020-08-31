@@ -16,7 +16,7 @@ $ npm install @akabeko/svg2png
 
 ### `svg2png(options: SVG2PNGOptions): Promise<string[]>`
 
-Create the PNG file from the SVG file.
+Create the PNG file from the SVG file. `executablePath` and `fetcher` are optional, but one must be specified.
 
 - **options**: `SVG2PNGOptions` Options.
   - **input**: `String` Path of the input SVG file.
@@ -25,7 +25,7 @@ Create the PNG file from the SVG file.
     - **width**: `Number` Width (px).
     - **height**: `Number` Height (px).
   - **executablePath**: `String (Optional)` If use Chromium installed, specify the path of the executable file. If this is specified, `fetcher` will be ignored.
-  - **fetcher**: `Object` Information for downloading and using Chromium.
+  - **fetcher**: `Object (Optional)` Information for downloading and using Chromium.
     - **revision**: `String` Revision of the download Chromium. see: http://omahaproxy.appspot.com/
     - **path**: `String` Path of the directory to download. If not specified, it will be selected in the puppeteer-core directory of `node_moduels`.
 

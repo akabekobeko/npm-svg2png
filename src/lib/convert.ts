@@ -78,11 +78,12 @@ const createPNG = async (page: Page, size: Size, filePath: string) => {
 }
 
 /**
- *
+ * Create the output PNG file path based on the size specification.
  * @param dir Path of the parent directory.
  * @param name Name of the PNG file.
  * @param ext File extention of the PNG file (User specified).
  * @param size Size of the PNG image.
+ * @returns If width and height of the size specification are equal (square), it is a path with a file name such as `sample-32.png`, otherwise `sample.32x48.png`.
  */
 const createFilePath = (
   dir: string,
