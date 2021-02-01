@@ -110,4 +110,4 @@ package-lock.json
 !.gitignore
 !.prettierrc
 !.prettierignore
-!.travis.yml
+!.github/
