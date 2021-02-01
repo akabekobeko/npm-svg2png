@@ -1,7 +1,7 @@
 # svg2png
 
 [![npm version](https://badge.fury.io/js/%40akabeko%2Fsvg2png.svg)](https://badge.fury.io/js/%40akabeko%2Fsvg2png)
-[![Build Status](https://travis-ci.org/akabekobeko/npm-svg2png.svg?branch=master)](https://travis-ci.org/akabekobeko/npm-svg2png)
+![test](https://github.com/akabekobeko/npm-svg2png/workflows/test/badge.svg)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/akabekobeko/npm-svg2png/blob/master/LICENSE)
 
 Create PNG file from SVG file with [puppeteer-core](https://www.npmjs.com/package/puppeteer-core). Use the specified revision or installed Chromium for PNG file creation.
